@@ -25,9 +25,9 @@ void arquivoNomeEstado(char *str, char processo[]){
 		strcat(str, "/status");
 }
 
-void imprimiOwner(char *str, char processo[]){
+void imprimiOwner(char *str, char processo[], char *owner){
 	struct stat sb;
-    //char outstr[200];	
+    limpaString(owner);
 	
 	strcpy(str, "/proc/");				
 	strcat(str, processo);			
@@ -36,6 +36,7 @@ void imprimiOwner(char *str, char processo[]){
 	stat(str, &sb);
 	struct passwd *pw = getpwuid(sb.st_uid);
 	printf("|%s", pw->pw_name);
+	strcpy(owner, pw->pw_name);
 }
 
 
@@ -65,9 +66,7 @@ int func(char str[], int *numProc)
 {
 	int a;
 	FILE *fp;
-	char str2[100], pchTemp[100], str3[100], word[100], str4[100], str5[100];	
-	
-    
+	char str2[100], pchTemp[100], str3[100], word[100], str4[100], str5[100], owner[100];	    
 
 	limpaString(str2);
 	limpaString(pchTemp);
@@ -82,14 +81,17 @@ int func(char str[], int *numProc)
 		if(*numProc < 20){
 			printf("|%s", word);
 			*numProc = *numProc + 1;
-
+		//acertando o layout	
 		for (a = 0; a < 8 - (strlen(word)); a++)
 			printf(" ");
 
 		arquivoNomeProcesso(str3, word);
 		arquivoNomeEstado(str4, word);				
 			
-		imprimiOwner(str5, word);	
+		imprimiOwner(str5, word, owner);	
+		//acertando o layout	
+		for (a = 0; a < 9 - (strlen(owner)); a++)
+			printf(" ");
 			
 		retornarNomeProcesso(str3,pchTemp);
 		//retornarNomeProcesso(str4,pchTemp);
@@ -108,10 +110,6 @@ int main(){
 	int numProc = 0;
 	printf("|PID     | User    | PROCNAME | Estado |\n");
 	printf("-------------------------------\n");
-	//printf("|1       ");
-	//arquivoNomeProcesso(str,"1");
-	//retornarNomeProcesso(str,str2);
-	//imprimiOwner(str3,"1");
 	func("/proc/1/task/1/children", &numProc);
     return 0;
 }
