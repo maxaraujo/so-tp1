@@ -4,6 +4,10 @@
 #include <string.h>
 #include <stdlib.h>
 
+void limpaString(char *str){
+	strcpy(str,"");
+}
+
 void arquivoNomeProcesso(char *str, char processo[]){
 		strcpy(str, "/proc/");				
 		strcat(str, processo);		
@@ -29,9 +33,8 @@ void retornarNomeProcesso(char str[], char *str2){
 		while (fscanf(fp,"%s", word) != EOF) { 
 			strcat(str2, word);
 			printf("%s \n", str2);
-			strcpy(str2,"");
-		}	
-	
+			limpaString(str2);
+		}		
 	fclose(fp);
 }
 
@@ -40,8 +43,8 @@ int func(char str[], int espaco)
 	int a;	
 	FILE *fp;
 	char str2[100], pchTemp[100], str3[100], word[100];
-	strcpy(str2,"");
-	strcpy(pchTemp,"");
+	limpaString(str2);
+	limpaString(pchTemp);
 	fp = fopen (str,"r");	      
 
 	while (fscanf(fp,"%s", word) != EOF) {    
@@ -51,7 +54,6 @@ int func(char str[], int espaco)
 		arquivoNomeProcesso(str3, word);	
 		retornarNomeProcesso(str3,pchTemp);
 		
-		strcpy(str2, "");		
 		arquivoFilhos(str2, word);
 		
 		func(str2, espaco+1);
