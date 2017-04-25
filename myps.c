@@ -1,49 +1,141 @@
- /* print files in current directory in reverse order */
-#include <stdio.h>
+                        
+[00:28, 25/4/2017] Cesar Augusto: #include <stdio.h>
 #include <dirent.h>
 #include <ctype.h>
 #include <string.h>
+#include <stdlib.h>
 
-int func(char *str, int espaco) 
-{
-	int c, a;	
+void arquivoNomeProcesso(char *str, char processo[]){
+		strcpy(str, "/proc/");				
+		strcat(str, processo);		
+		strcat(str, "/task/");			
+		strcat(str, processo);		
+		strcat(str, "/comm");
+}
+
+void arquivoFilhos(char *str, char processo[]){
+		strcpy(str, "/proc/");				
+		strcat(str, processo);		
+		strcat(str, "/task/");			
+		strcat(str, processo);		
+		strcat(str, "/children");
+}
+
+void retornarNomeProcesso(char str[], char *str2){
 	FILE *fp;
-	char *pch, line[1000], str2[100], pchTemp[100];
+	char word[100];
+	
+	fp = fopen (str,"r");	
+		
+		while (fscanf(fp,"%s", word) != EOF) { 
+			strcat(str2, word);
+			printf("%s \n", str2);
+			strcpy(str2,"");
+		}	
+	
+	fclose(fp);
+}
+
+int func(char str[], int espaco) 
+{
+	int a;	
+	FILE *fp;
+	char *pch, line[1000], str2[100], pchTemp[100], str3[100], word[100],word2[100];
 	strcpy(str2,"");
 	strcpy(pchTemp,"");
-	fp = fopen (str,"r");	
-	if (fp == NULL){
-		printf ("entrei \n");
-		return 0;
+	fp = fopen (str,"r");	      
+
+	while (fscanf(fp,"%s", word) != EOF) {    
+		for (a=0; a<espaco;a++)
+				 	strcat(pchTemp, "__");
+		
+		arquivoNomeProcesso(str3, word);	
+		retornarNomeProcesso(str3,pchTemp);
+		
+		strcpy(str2, "");		
+		arquivoFilhos(str2, word);
+		
+		func(str2, espaco+1);
 	}
-	else{
-		while (fgets(line, sizeof(line), fp)) {        
-		 	pch = strtok (line," ");
-			 while (pch != NULL)
-			  {
-			    //for(a=0; a<espaco; a++){
-				//strcat(pchTemp, "\t");
-			    //}
-			    //strcat(pchTemp, pch);
-			    //printf ("%s\n",pchTemp);
-			    printf ("%s\n",pch);
-			    strcpy(str2, "/proc/");			
-			    strcat(str2, pch);
-			    strcat(str2, "/task/");	
-			    strcat(str2, pch);
-			    strcat(str2, "/children");
-			    printf ("%s\n",str2);
-			    func(str2, espaco+1);
-			    pch = strtok (NULL, " ");
-		  }
-    	}
-	//fclose(fp);
-	return 0;
-	}
+	fclose(fp);
+	return 0;	
 }
 
 main(){
+	char str[100], str2[100];
+	
+	arquivoNomeProcesso(str,"1");
+	retornarNomeProcesso(str,str2);
+	func("/proc/1/task/1/children", 1);
 
-func("/proc/1/task/1/children", 0);
+}                        
+[00:30, 25/4/2017] Cesar Augusto: #include <stdio.h>
+#include <dirent.h>
+#include <ctype.h>
+#include <string.h>
+#include <stdlib.h>
 
-} 
+void arquivoNomeProcesso(char *str, char processo[]){
+		strcpy(str, "/proc/");				
+		strcat(str, processo);		
+		strcat(str, "/task/");			
+		strcat(str, processo);		
+		strcat(str, "/comm");
+}
+
+void arquivoFilhos(char *str, char processo[]){
+		strcpy(str, "/proc/");				
+		strcat(str, processo);		
+		strcat(str, "/task/");			
+		strcat(str, processo);		
+		strcat(str, "/children");
+}
+
+void retornarNomeProcesso(char str[], char *str2){
+	FILE *fp;
+	char word[100];
+	
+	fp = fopen (str,"r");	
+		
+		while (fscanf(fp,"%s", word) != EOF) { 
+			strcat(str2, word);
+			printf("%s \n", str2);
+			strcpy(str2,"");
+		}	
+	
+	fclose(fp);
+}
+
+int func(char str[], int espaco) 
+{
+	int a;	
+	FILE *fp;
+	char str2[100], pchTemp[100], str3[100], word[100];
+	strcpy(str2,"");
+	strcpy(pchTemp,"");
+	fp = fopen (str,"r");	      
+
+	while (fscanf(fp,"%s", word) != EOF) {    
+		for (a=0; a<espaco;a++)
+				 	strcat(pchTemp, "__");
+		
+		arquivoNomeProcesso(str3, word);	
+		retornarNomeProcesso(str3,pchTemp);
+		
+		strcpy(str2, "");		
+		arquivoFilhos(str2, word);
+		
+		func(str2, espaco+1);
+	}
+	fclose(fp);
+	return 0;	
+}
+
+int main(){
+	char str[100], str2[100];
+	
+	arquivoNomeProcesso(str,"1");
+	retornarNomeProcesso(str,str2);
+	func("/proc/1/task/1/children", 1);
+    return 0;
+}
