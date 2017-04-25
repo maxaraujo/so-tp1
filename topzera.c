@@ -31,8 +31,6 @@ void arquivoFilhos(char *str, char processo[]){
 		strcat(str, "/children");
 }
 
-
-
 void retornarNomeProcesso(char str[], char *str2){
 	FILE *fp;
 	char word[100];
@@ -47,35 +45,37 @@ void retornarNomeProcesso(char str[], char *str2){
 	fclose(fp);
 }
 
-int func(char str[], int espaco) 
+int func(char str[], int *numProc) 
 {
-	int a;	
+	int a;
 	FILE *fp;
 	char str2[100], pchTemp[100], str3[100], word[100], str4[100];
 	limpaString(str2);
 	limpaString(pchTemp);
-	fp = fopen (str,"r");	      
-
+	fp = fopen (str,"r");	     
+	
+	//so vai imprimir o processo se ainda nao imprimiu 20 processos
+	if (*numProc > 20)
+		return 0;
+	
 	while (fscanf(fp,"%s", word) != EOF) {    
-		//for (a=0; a<espaco;a++)
-				 	//strcat(pchTemp, "__");
-		
-		printf("|%s", word);
+		//so vai imprimir o processo se ainda nao imprimiu 20 processos
+		if(*numProc < 20){
+			printf("|%s", word);
+			*numProc = *numProc + 1;
 
 		for (a = 0; a < 8 - (strlen(word)); a++)
 			printf(" ");
-		
+
 		arquivoNomeProcesso(str3, word);
-
 		arquivoNomeEstado(str4, word);		
-
 		retornarNomeProcesso(str3,pchTemp);
-
 		//retornarNomeProcesso(str4,pchTemp);
-		
 		arquivoFilhos(str2, word);
-		
-		func(str2, espaco+1);
+		//chamando o filho do processo atual
+		func(str2, numProc);
+	}else
+			break;
 	}
 	fclose(fp);
 	return 0;	
@@ -83,11 +83,12 @@ int func(char str[], int espaco)
 
 int main(){
 	char str[100], str2[100];
+	int numProc = 1;
 	printf("|PID     | User    | PROCNAME | Estado |\n");
 	printf("-------------------------------\n");
 	printf("|1       ");
 	arquivoNomeProcesso(str,"1");
 	retornarNomeProcesso(str,str2);
-	func("/proc/1/task/1/children", 1);
+	func("/proc/1/task/1/children", &numProc);
     return 0;
 }
