@@ -16,6 +16,13 @@ void arquivoNomeProcesso(char *str, char processo[]){
 		strcat(str, "/comm");
 }
 
+void arquivoNomeEstado(char *str, char processo[]){
+		strcpy(str, "/proc/");				
+		strcat(str, processo);			
+		strcat(str, "/status");
+}
+
+
 void arquivoFilhos(char *str, char processo[]){
 		strcpy(str, "/proc/");				
 		strcat(str, processo);		
@@ -23,6 +30,8 @@ void arquivoFilhos(char *str, char processo[]){
 		strcat(str, processo);		
 		strcat(str, "/children");
 }
+
+
 
 void retornarNomeProcesso(char str[], char *str2){
 	FILE *fp;
@@ -32,7 +41,7 @@ void retornarNomeProcesso(char str[], char *str2){
 		
 		while (fscanf(fp,"%s", word) != EOF) { 
 			strcat(str2, word);
-			printf("%s \n", str2);
+			printf("|%s\n", str2);
 			limpaString(str2);
 		}		
 	fclose(fp);
@@ -42,7 +51,7 @@ int func(char str[], int espaco)
 {
 	int a;	
 	FILE *fp;
-	char str2[100], pchTemp[100], str3[100], word[100];
+	char str2[100], pchTemp[100], str3[100], word[100], str4[100];
 	limpaString(str2);
 	limpaString(pchTemp);
 	fp = fopen (str,"r");	      
@@ -51,8 +60,18 @@ int func(char str[], int espaco)
 		//for (a=0; a<espaco;a++)
 				 	//strcat(pchTemp, "__");
 		
-		arquivoNomeProcesso(str3, word);	
+		printf("|%s", word);
+
+		for (a = 0; a < 8 - (strlen(word)); a++)
+			printf(" ");
+		
+		arquivoNomeProcesso(str3, word);
+
+		arquivoNomeEstado(str4, word);		
+
 		retornarNomeProcesso(str3,pchTemp);
+
+		//retornarNomeProcesso(str4,pchTemp);
 		
 		arquivoFilhos(str2, word);
 		
@@ -64,7 +83,9 @@ int func(char str[], int espaco)
 
 int main(){
 	char str[100], str2[100];
-	
+	printf("|PID     | User    | PROCNAME | Estado |\n");
+	printf("-------------------------------\n");
+	printf("|1       ");
 	arquivoNomeProcesso(str,"1");
 	retornarNomeProcesso(str,str2);
 	func("/proc/1/task/1/children", 1);
