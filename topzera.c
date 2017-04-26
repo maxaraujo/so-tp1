@@ -6,6 +6,12 @@
 #include <pwd.h>
 #include <grp.h>
 #include <sys/stat.h>
+#include <signal.h>
+
+#include <unistd.h>
+#include <sys/wait.h>
+#include <sys/types.h>
+
 
 void limpaString(char *str){
 	strcpy(str,"");
@@ -95,14 +101,14 @@ int func(char str[], int *numProc)
 	fp = fopen (str,"r");	     
 	
 	//so vai imprimir o processo se ainda nao imprimiu 20 processos
-	if (*numProc > 20)
-		return 0;
+	//if (*numProc > 80)
+	//	return 0;
 	
 	while (fscanf(fp,"%s", word) != EOF) {    
 		//so vai imprimir o processo se ainda nao imprimiu 20 processos
-		if(*numProc < 20){
+		//if(*numProc < 80){
 			printf("|%s", word);
-			*numProc = *numProc + 1;
+			//*numProc = *numProc + 1;
 		//acertando o layout	
 		for (a = 0; a < 8 - (strlen(word)); a++)
 			printf(" ");
@@ -123,12 +129,15 @@ int func(char str[], int *numProc)
 		arquivoFilhos(str2, word);
 		//chamando o filho do processo atual
 		func(str2, numProc);
-	}else
-			break;
+	//}else
+	//		break;
 	}
 	fclose(fp);
 	return 0;	
 }
+
+
+
 
 int main(){
 	char str[100], str2[100], str3[100];
@@ -136,5 +145,18 @@ int main(){
 	printf("|PID     | User          | PROCNAME           | Estado |\n");
 	printf("----------------------------------------------------------\n");
 	func("/proc/1/task/1/children", &numProc);
+	
+	
+	pid_t pid;
+    
+    int signo;
+
+    scanf("%d %d",&pid,&signo);
+
+    kill(pid,signo);
+	
+	
+	
+	
     return 0;
 }
