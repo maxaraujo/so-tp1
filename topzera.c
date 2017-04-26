@@ -20,9 +20,28 @@ void arquivoNomeProcesso(char *str, char processo[]){
 }
 
 void arquivoNomeEstado(char *str, char processo[]){
+        int i;
 		strcpy(str, "/proc/");				
 		strcat(str, processo);			
 		strcat(str, "/status");
+		
+		FILE *fp;
+	    char word[100];
+	
+	    fp = fopen (str,"r");
+	    for(i = 0; i < 6; i++){
+	        fscanf(fp,"%s", word);
+	    }
+		
+		printf("|%s",word);
+		
+		for (i = 0; i < 8 - (strlen(word)); i++)
+			printf(" ");
+			
+		printf("|\n");
+		
+		fclose(fp);
+		
 }
 
 void imprimiOwner(char *str, char processo[], char *owner){
@@ -50,15 +69,18 @@ void arquivoFilhos(char *str, char processo[]){
 
 void retornarNomeProcesso(char str[], char *str2){
 	FILE *fp;
+	int a;
 	char word[100];
 	
 	fp = fopen (str,"r");	
 		
 		while (fscanf(fp,"%s", word) != EOF) { 
 			strcat(str2, word);
-			printf("|%s\n", str2);
+			printf("|%s", str2);
 			limpaString(str2);
-		}		
+		}
+		for (a = 0; a < 20 - (strlen(word)); a++)
+			printf(" ");		
 	fclose(fp);
 }
 
@@ -86,14 +108,17 @@ int func(char str[], int *numProc)
 			printf(" ");
 
 		arquivoNomeProcesso(str3, word);
-		arquivoNomeEstado(str4, word);				
+						
 			
 		imprimiOwner(str5, word, owner);	
 		//acertando o layout	
-		for (a = 0; a < 9 - (strlen(owner)); a++)
+		for (a = 0; a < 15 - (strlen(owner)); a++)
 			printf(" ");
 			
 		retornarNomeProcesso(str3,pchTemp);
+		
+		arquivoNomeEstado(str4, word);
+		
 		//retornarNomeProcesso(str4,pchTemp);
 		arquivoFilhos(str2, word);
 		//chamando o filho do processo atual
@@ -108,8 +133,8 @@ int func(char str[], int *numProc)
 int main(){
 	char str[100], str2[100], str3[100];
 	int numProc = 0;
-	printf("|PID     | User    | PROCNAME | Estado |\n");
-	printf("-------------------------------\n");
+	printf("|PID     | User          | PROCNAME           | Estado |\n");
+	printf("----------------------------------------------------------\n");
 	func("/proc/1/task/1/children", &numProc);
     return 0;
 }
