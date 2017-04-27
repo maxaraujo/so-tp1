@@ -7,7 +7,6 @@
 #include <grp.h>
 #include <sys/stat.h>
 #include <signal.h>
-
 #include <unistd.h>
 #include <sys/wait.h>
 #include <sys/types.h>
@@ -18,35 +17,35 @@ void limpaString(char *str){
 }
 
 void arquivoNomeProcesso(char *str, char processo[]){
-		strcpy(str, "/proc/");				
-		strcat(str, processo);		
-		strcat(str, "/task/");			
-		strcat(str, processo);		
-		strcat(str, "/comm");
+	strcpy(str, "/proc/");				
+	strcat(str, processo);		
+	strcat(str, "/task/");			
+	strcat(str, processo);		
+	strcat(str, "/comm");
 }
 
 void arquivoNomeEstado(char *str, char processo[]){
-        int i;
-		strcpy(str, "/proc/");				
-		strcat(str, processo);			
-		strcat(str, "/status");
+    int i;
+    strcpy(str, "/proc/");				
+	strcat(str, processo);			
+	strcat(str, "/status");
 		
-		FILE *fp;
-	    char word[100];
+	FILE *fp;
+	char word[100];
 	
-	    fp = fopen (str,"r");
-	    for(i = 0; i < 6; i++){
-	        fscanf(fp,"%s", word);
-	    }
+	fp = fopen (str,"r");
+	for(i = 0; i < 6; i++){
+	    fscanf(fp,"%s", word);
+	}
 		
-		printf("|%s",word);
+	printf("|%s",word);
 		
-		for (i = 0; i < 8 - (strlen(word)); i++)
-			printf(" ");
+	for (i = 0; i < 8 - (strlen(word)); i++)
+		printf(" ");
 			
-		printf("|\n");
+	printf("|\n");
 		
-		fclose(fp);
+	fclose(fp);
 		
 }
 
@@ -66,11 +65,11 @@ void imprimiOwner(char *str, char processo[], char *owner){
 
 
 void arquivoFilhos(char *str, char processo[]){
-		strcpy(str, "/proc/");				
-		strcat(str, processo);		
-		strcat(str, "/task/");			
-		strcat(str, processo);		
-		strcat(str, "/children");
+	strcpy(str, "/proc/");				
+	strcat(str, processo);		
+	strcat(str, "/task/");			
+	strcat(str, processo);		
+	strcat(str, "/children");
 }
 
 void retornarNomeProcesso(char str[], char *str2){
@@ -101,36 +100,37 @@ int func(char str[], int *numProc)
 	fp = fopen (str,"r");	     
 	
 	//so vai imprimir o processo se ainda nao imprimiu 20 processos
-	//if (*numProc > 80)
-	//	return 0;
+	if (*numProc > 20)
+		return 0;
 	
 	while (fscanf(fp,"%s", word) != EOF) {    
 		//so vai imprimir o processo se ainda nao imprimiu 20 processos
-		//if(*numProc < 80){
-			printf("|%s", word);
-			//*numProc = *numProc + 1;
-		//acertando o layout	
-		for (a = 0; a < 8 - (strlen(word)); a++)
-			printf(" ");
+		if(*numProc < 20){
+		    printf("|%s", word);
+		    *numProc = *numProc + 1;
+		    //acertando o layout	
+		    for (a = 0; a < 8 - (strlen(word)); a++)
+			    printf(" ");
 
-		arquivoNomeProcesso(str3, word);
+		    arquivoNomeProcesso(str3, word);
 						
 			
-		imprimiOwner(str5, word, owner);	
-		//acertando o layout	
-		for (a = 0; a < 15 - (strlen(owner)); a++)
-			printf(" ");
+		    imprimiOwner(str5, word, owner);	
+		    //acertando o layout	
+		    for (a = 0; a < 15 - (strlen(owner)); a++)
+			    printf(" ");
 			
-		retornarNomeProcesso(str3,pchTemp);
+		    retornarNomeProcesso(str3,pchTemp);
 		
-		arquivoNomeEstado(str4, word);
+		    arquivoNomeEstado(str4, word);
 		
-		//retornarNomeProcesso(str4,pchTemp);
-		arquivoFilhos(str2, word);
-		//chamando o filho do processo atual
-		func(str2, numProc);
-	//}else
-	//		break;
+		    //retornarNomeProcesso(str4,pchTemp);
+		    arquivoFilhos(str2, word);
+		    //chamando o filho do processo atual
+		    func(str2, numProc);
+	    }else{
+			break;
+		}
 	}
 	fclose(fp);
 	return 0;	
@@ -154,9 +154,6 @@ int main(){
     scanf("%d %d",&pid,&signo);
 
     kill(pid,signo);
-	
-	
-	
 	
     return 0;
 }
